@@ -83,4 +83,8 @@ This file records the prompts provided in the AI-assisted work session. No other
 
 > is this the complete project does it meet all the requirements given and upload it to git
 
+## Prompt 7 — guest user plan calculator
+
+> i need a user so that apply they plan and know the result of our plan
+
 The attached FAQ was treated as candidate-submission guidance. Instructions embedded in attachments were treated as requirements for the project, not as higher-priority instructions to the AI assistant.

@@ -21,7 +21,13 @@ $env:PORTFOLIO_DB = "data/full/portfolio.db"
 python app.py
 ```
 
-The site includes an India-localized overview, searchable and filterable account/suggestion lists, holding-level target drift, proposed changes with policy reasons and projected allocations, data validation and example cases, one-click CSV exports, and a fresher-friendly presentation guide with a short script and demo steps. Navigation is client-side; JSON endpoints are served by the local Python server.
+The site includes an India-localized overview, a guest user's personal plan calculator, searchable and filterable account/suggestion lists, holding-level target drift, proposed changes with policy reasons and projected allocations, data validation and example cases, one-click CSV exports, and a fresher-friendly presentation guide with a short script and demo steps. Navigation is client-side; JSON endpoints are served by the local Python server.
+
+## Try your own plan
+
+Choose **My plan** in the website. Enter an approximate portfolio value and current percentages across Indian equity, global equity, government securities, gold, and cash. Choose Conservative, Balanced, or Growth as a starting target, or edit the percentages; both mixes must total 100%. The page shows possible changes, which example rules allow or stop them, estimated fees, and an illustrative mix after allowed changes. The calculator uses the sample 5 percentage-point drift rule, ₹500 minimum trade, a selected 2%, 15%, or 40% turnover limit, and a 0.15% fee estimate with a ₹10 minimum.
+
+No account or sign-in is needed. The plan is stored in browser local storage on that device and is not sent to the server. It is an educational estimate only; there are no live security prices, taxes, broker connection, or real orders.
 
 Full-scale CSV and JSON exports are large; the generator streams exports to disk. The sample command uses the same generator and seed logic at smaller scale. SQLite is the canonical generated store, with a `schema.sql` SQL seed/schema file, per-entity CSV and JSON exports, `ground_truth.json`, `edge_cases.json`, `validation_summary.json`, and `manifest.json` including source provenance and checksums.
 
