@@ -25,7 +25,7 @@ The site includes an India-localized overview, a guest user's personal plan calc
 
 ## Try your own plan
 
-Choose **My plan** in the website. Enter an approximate portfolio value and current percentages across Indian equity, global equity, government securities, gold, and cash. Choose Conservative, Balanced, or Growth as a starting target, or edit the percentages; both mixes must total 100%. The page shows possible changes, which example rules allow or stop them, estimated fees, and an illustrative mix after allowed changes. The calculator uses the sample 5 percentage-point drift rule, ₹500 minimum trade, a selected 2%, 15%, or 40% turnover limit, and a 0.15% fee estimate with a ₹10 minimum.
+Choose **My plan** in the website. Enter an approximate portfolio value and current percentages across Indian equity, global equity, government securities, gold, and cash. Choose Conservative, Balanced, or Growth as a starting target, or edit the percentages; both mixes must total 100%. Results update as valid inputs change and include before/after allocation bars, a comparison of the three target plans, optional simulated price moves, and plain-language explanations for each rule result. Users can download the result as a JSON summary. The calculator uses the sample 5 percentage-point drift rule, ₹500 minimum trade, a selected 2%, 15%, or 40% turnover limit, and a 0.15% fee estimate with a ₹10 minimum.
 
 No account or sign-in is needed. The plan is stored in browser local storage on that device and is not sent to the server. It is an educational estimate only; there are no live security prices, taxes, broker connection, or real orders.
 
