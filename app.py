@@ -162,4 +162,4 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(); parser.add_argument('--host',default='127.0.0.1'); parser.add_argument('--port',type=int,default=8010); args=parser.parse_args()
     if args.host not in ('127.0.0.1','localhost','::1'): parser.error('This demo server is local-only. Use an HTTPS production server for network access.')
     auth_store.initialize()
-    print(f'Nivesh India at http://{args.host}:{args.port} (DB: {DB})',flush=True); ThreadingHTTPServer((args.host,args.port),Handler).serve_forever()
+    print(f'Portfolio Rebalance Studio at http://{args.host}:{args.port} (DB: {DB})',flush=True); ThreadingHTTPServer((args.host,args.port),Handler).serve_forever()

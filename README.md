@@ -1,18 +1,32 @@
-# Portfolio Rebalancer
+# Portfolio Rebalance Studio
 
-A local, explainable Indian-market portfolio-rebalancing website. It uses INR, Indian number/date formatting, and Indian equity, global equity, government securities, gold, and cash allocation categories. It compares holdings with effective target allocations, applies policy checks, estimates fees, records proposal/trade outcomes, and exposes exceptions through overview, portfolio, proposal, data, and methodology pages. It does not connect to a broker or place orders. All data is synthetic; there are no live NSE/BSE prices or real securities. This is educational software, not financial advice.
+An explainable portfolio-rebalancing demo for Indian-market scenarios. It compares synthetic holdings with target allocations, applies transparent sample rules, estimates fees, and shows proposal exceptions and illustrative outcomes. The interface uses INR and Indian date and number formatting.
 
-## Run locally
+All investment data is synthetic. There are no live NSE/BSE prices, broker or bank connections, real orders, or personalized investment advice.
 
-Requires Python 3.10 or newer; no package installation or network service is needed.
+## Requirements
+
+- Windows, macOS, or Linux
+- Python 3.10 or newer
+- A modern browser with JavaScript enabled
+- No third-party Python packages, Node.js packages, API keys, or internet connection are required to run the app
+
+The Python server and data tools use the standard library, including `argparse`, `csv`, `datetime`, `hashlib`, `hmac`, `http.server`, `json`, `pathlib`, `random`, and `sqlite3`. The website uses plain HTML, CSS, and JavaScript; there is no frontend build step or package manager.
+
+## Run the project
+
+Open PowerShell or a terminal in the project folder. Generate the sample dataset, validate it, then start the website:
 
 ```powershell
+python --version
 python generate_data.py --out data --portfolios 30 --holdings-per-portfolio 5 --days 30
 python validate_data.py data/portfolio.db
 python app.py
 ```
 
-Open <http://127.0.0.1:8010>. The server binds to localhost and defaults to port 8010; choose another free port with `python app.py --port 8020` if needed. To generate the requested full baseline (1,000 portfolios, 5,000 instruments and holdings, 250 trading days of prices), run:
+Open <http://127.0.0.1:8010> in your browser. The development server listens on localhost only. If port 8010 is already in use, run `python app.py --port 8020` and open <http://127.0.0.1:8020>.
+
+To generate the larger candidate dataset (1,000 portfolios, 5 holdings per portfolio, and 250 weekdays of prices), run:
 
 ```powershell
 python generate_data.py --out data/full --portfolios 1000 --holdings-per-portfolio 5 --days 250 --seed 20261022
@@ -21,61 +35,41 @@ $env:PORTFOLIO_DB = "data/full/portfolio.db"
 python app.py
 ```
 
-The site includes an India-localized overview, a guest user's personal plan calculator, searchable and filterable account/suggestion lists, holding-level target drift, proposed changes with policy reasons and projected allocations, data validation and example cases, one-click CSV exports, and a fresher-friendly presentation guide with a short script and demo steps. Navigation is client-side; JSON endpoints are served by the local Python server.
+Stop the local server with `Ctrl+C`. The `data/user_store.sqlite` file is created locally when the server starts and is excluded from Git. It contains account records and saved plans; never commit it.
 
-## Try your own plan
+## What the application includes
 
-Choose **My plan** in the website. Enter an approximate portfolio value and current percentages across Indian equity, global equity, government securities, gold, and cash. Choose Conservative, Balanced, or Growth as a starting target, or edit the percentages; both mixes must total 100%. Results update as valid inputs change and include before/after allocation bars, a comparison of the three target plans, optional simulated price moves, and plain-language explanations for each rule result. Users can download the result as a JSON summary. The calculator uses the sample 5 percentage-point drift rule, ₹500 minimum trade, a selected 2%, 15%, or 40% turnover limit, and a 0.15% fee estimate with a ₹10 minimum.
+- **Overview:** dataset metrics, proposal statuses, common exceptions, and accounts to review.
+- **Accounts & suggestions:** one combined searchable and filterable view. Each row shows an account and its proposal outcome; open a row to inspect holdings, drift, suggested changes, fees, and rule results.
+- **My plan:** enter a portfolio value and current asset mix; select or edit a target; compare sample targets; try a simulated price move; see explanations and download a JSON summary.
+- **Sign in:** create a local demo account to save and restore a personal plan. Guests may still use the calculator without saving.
+- **Data & examples, How it works, Presentation guide:** inspect sample data and edge cases, understand the rules, and follow a short demo path.
 
-You can try the calculator as a guest. To save a plan to your own account and restore it later, use the Sign in page. The estimate is educational only; there are no live security prices, taxes, broker connection, or real orders.
+The sample rebalancing rules include a 5 percentage-point drift trigger, a ₹500 minimum trade, example turnover limits, and a fee estimate. These are simplified teaching rules, not investment guidance.
 
-Full-scale CSV and JSON exports are large; the generator streams exports to disk. The sample command uses the same generator and seed logic at smaller scale. SQLite is the canonical generated store, with a `schema.sql` SQL seed/schema file, per-entity CSV and JSON exports, `ground_truth.json`, `edge_cases.json`, `validation_summary.json`, and `manifest.json` including source provenance and checksums.
+## Sign in and security limits
 
-## Sign in and save a plan
+Create an account from **Sign in** using an email address and a passphrase of at least 12 characters. After signing in, valid planner inputs save automatically to the local `data/user_store.sqlite` database and load again on sign-in. Passwords are stored as salted PBKDF2-HMAC-SHA256 hashes. Session tokens are random, stored hashed on the server, and sent to the browser in an HttpOnly, SameSite cookie. State-changing account requests check their origin and a CSRF token.
 
-Open **Sign in** in the left menu. Create an account with an email and a passphrase of at least 12 characters, then use **My plan**. A valid plan is saved automatically to that account in the local SQLite file `data/user_store.sqlite`; signing in again on the same running app restores it. The password is stored as a salted PBKDF2-HMAC-SHA256 hash, and the browser receives a random, HttpOnly session cookie.
+This is a local candidate-project demo, not a production identity service. It has no email verification, password reset, account deletion, encrypted database, or backup service. Do not expose the built-in Python server to a public or untrusted network. A real public deployment requires HTTPS, a production web server, rate limiting, monitoring, protected configuration, secure backups, and a reviewed account recovery process. If HTTPS is configured in a local reverse-proxy setup, set `AUTH_COOKIE_SECURE=1` before starting the app so cookies include the Secure attribute.
 
-This is a candidate-project demo, not a production identity service: it has no email verification, password reset, account deletion, encrypted database, or hosting backup. Keep the built-in Python server on your own computer (`127.0.0.1`). Do not bind it to a public/network address. A public deployment needs HTTPS, a production web server, protected secret/configuration management, rate limiting, monitoring, secure backups, and a reviewed account recovery flow. When running behind HTTPS locally, set `AUTH_COOKIE_SECURE=1` so session cookies include the Secure attribute.
+## Data, rules, and validation
 
-## How it works
+The generator creates parent entities before dependent records, uses deterministic identifiers, and derives proposal labels from documented rules. Deliberate negative scenarios are stored separately from the valid baseline. SQLite is the canonical dataset; CSV and JSON exports, a manifest, ground truth, edge-case fixtures, and a validation summary are generated alongside it.
 
-1. The fixed-seed generator creates master entities before dependent records and uses stable, zero-padded identifiers.
-2. Proposal generation values each holding at the latest available price, compares its current weight to the target for that asset class, then applies drift, minimum trade, excluded-instrument, missing-price and available-quantity rules.
-3. Trade records keep an explicit status and reason. A proposal carries its lifecycle status and exception codes; prior proposal records are not overwritten by the dashboard.
-4. Fees use the account fee rate and minimum fee. Output totals are calculated from source holdings/prices and persisted proposal/trade records.
-5. `ground_truth.json` labels deterministic generated conditions. `edge_cases.json` keeps the five deliberately invalid negative scenarios separate from normal input records.
+See [docs/data_dictionary.md](docs/data_dictionary.md) for entity fields, relationships, and lifecycle notes, and [schema.sql](schema.sql) for table definitions and constraints. Run `python validate_data.py data/portfolio.db` after generation to check keys, foreign keys, allowed states, dates, allocation totals, fee reconciliation, turnover, and trade rules.
 
-## Model and rules
+## Project files
 
-See [docs/data_dictionary.md](docs/data_dictionary.md) for fields, types, key rules, cardinality, and lifecycle notes. `schema.sql` defines eleven normalized tables with primary/foreign keys, checks, and indexes. The principal cardinalities are one investor to many portfolios; one portfolio to many holdings, targets, fees, constraints, and proposals; one instrument to many holdings and dated prices; and one proposal to many trades and projected-allocation rows. Portfolio/instrument is a many-to-many relationship through `Holding`. Proposal/trade state is stored as records rather than updated in place. `MarketPrice` and policy records are dated/effective-dated.
+- `app.py` — local HTTP server and JSON API
+- `auth_store.py` — local account, session, and saved-plan storage
+- `generate_data.py` — deterministic synthetic-data generator
+- `validate_data.py` — dataset validation
+- `schema.sql` — SQLite schema
+- `web/` — browser interface, styles, and client-side logic
+- `docs/data_dictionary.md` — data model documentation
+- `AI_PROMPTS.md` — professional summaries of the AI-assisted project specifications
 
-Constraints are educational policy examples: 5 percentage-point drift threshold, ₹500 minimum trade, per-account maximum turnover of 2%, 15%, or 40%, and exclusion of ineligible instruments. The simulator enforces minimum trade, drift, missing price, exclusion, sell-quantity, and turnover checks. The dashboard shows the first 250 portfolios and supports text search; use the API/exports for complete analysis. Allocation-negative and omitted-fee cases are documented fixtures, not corrupt baseline rows. The turnover cap limits proposed trade value; it is a simplified policy proxy and does not model exchange order-book liquidity.
+## AI-use disclosure
 
-The synthetic target mixes are: Conservative 20/5/45/10/20, Balanced 35/15/25/15/10, and Growth 55/20/10/10/5 across Indian equity, global equity, government securities, gold, and cash. They are illustrative allocations, not a prescribed Indian investment strategy. Amounts use INR and UI dates use Indian locale/Asia-Kolkata. The synthetic calendar uses weekdays and does not exclude Indian exchange holidays.
-
-Each portfolio's synthetic `account_value` sets its initial funding scale; `cash_balance` starts at ₹0 because the cash allocation is represented by its own synthetic holding, preventing cash from being counted twice.
-
-## Validation and reproducibility
-
-`validate_data.py [path/to/portfolio.db]` checks primary-key uniqueness, foreign keys, allowed states, effective-date order, target and projected allocation totals, proposal fee reconciliation, blocked-instrument rules, sell quantities, turnover caps, and holding/portfolio date order. The generator also writes a validation summary, row counts, source provenance, and SHA-256 checksums in its manifest. To compare two runs, generate into two separate directories using identical arguments and compare the `manifest.json` `checksums` and `counts` objects. `generated_at` is a fixed label to preserve reproducibility.
-
-Verification performed for this submission: JavaScript syntax check, local HTTP/API smoke check, full-dataset validation with zero reported errors, and two independent full-scale generations with seed `20261022`. The two fresh runs matched on all row counts and SHA-256 checksums (1,000 portfolios, 5,000 instruments, 5,000 holdings, and 1,249,956 price rows). The candidate FAQ does not require a hosted demo or automated test suite; these commands demonstrate local verification.
-
-## Assumptions and limitations
-
-- Synthetic INR prices and holdings are randomly varied from a fixed seed. The weekday-only calendar does not remove Indian exchange holidays. There is no external market-data source or personal information.
-- The UI and API are read-only and bind to localhost by default. No authentication is implemented; do not expose the server to an untrusted network.
-- Data is an educational simulation, not a recommendation engine for actual investments. Indian securities transaction tax, GST on fees, capital-gains taxes, lot-level cost basis, corporate actions, and live liquidity are not modeled.
-- Target weights sum to 100% in valid baseline records. Deliberate violations live in isolated edge-case fixtures and the corresponding expected decision is documented.
-
-## AI-use disclosure / prompt history
-
-AI-assisted implementation was used in this project. The full user prompt available in this work session is recorded in [`AI_PROMPTS.md`](AI_PROMPTS.md); no other AI tools were used in this workspace. The user should review the generated code, understand the rules and limitations above, and make any final changes before submitting under their name. AI responses are not required by the candidate FAQ.
-
-## Submission checklist
-
-- [x] Source code and local run instructions
-- [x] Synthetic data generator, fixed seed, parameterized scale, exports, schema, data dictionary, manifest and separate labels
-- [x] Negative scenario coverage and validation command
-- [x] AI assistance and prompt record
-- [ ] Publish this prepared project to a dedicated public GitHub repository and send its link from the recruiting email address (requires the candidate's GitHub account and their own submission action)
+AI assistance was used during project development. `AI_PROMPTS.md` records the professional project specifications used to guide that work; it is not a verbatim transcript of personal conversation text. Review the generated implementation and be prepared to explain its rules, data model, and limitations before presenting it.
