@@ -21,3 +21,7 @@ Add account registration and sign-in for users who want to save and restore pers
 ## 5. Documentation and delivery
 
 Document the application architecture, business rules, assumptions, limitations, required runtime, package dependencies, setup commands, data generation, validation, and demo steps. Keep setup reproducible and suitable for a beginner to run and present.
+
+## Development questions and clarifications
+
+During implementation, brief questions and clarifications were also used to understand how to start the local website, check whether the main requirements were covered, help a new user create and understand a plan, save a plan for later, and make the planner more interactive. These were ordinary project questions and troubleshooting discussions, not additional feature specifications.
