@@ -27,9 +27,15 @@ The site includes an India-localized overview, a guest user's personal plan calc
 
 Choose **My plan** in the website. Enter an approximate portfolio value and current percentages across Indian equity, global equity, government securities, gold, and cash. Choose Conservative, Balanced, or Growth as a starting target, or edit the percentages; both mixes must total 100%. Results update as valid inputs change and include before/after allocation bars, a comparison of the three target plans, optional simulated price moves, and plain-language explanations for each rule result. Users can download the result as a JSON summary. The calculator uses the sample 5 percentage-point drift rule, ₹500 minimum trade, a selected 2%, 15%, or 40% turnover limit, and a 0.15% fee estimate with a ₹10 minimum.
 
-No account or sign-in is needed. The plan is stored in browser local storage on that device and is not sent to the server. It is an educational estimate only; there are no live security prices, taxes, broker connection, or real orders.
+You can try the calculator as a guest. To save a plan to your own account and restore it later, use the Sign in page. The estimate is educational only; there are no live security prices, taxes, broker connection, or real orders.
 
 Full-scale CSV and JSON exports are large; the generator streams exports to disk. The sample command uses the same generator and seed logic at smaller scale. SQLite is the canonical generated store, with a `schema.sql` SQL seed/schema file, per-entity CSV and JSON exports, `ground_truth.json`, `edge_cases.json`, `validation_summary.json`, and `manifest.json` including source provenance and checksums.
+
+## Sign in and save a plan
+
+Open **Sign in** in the left menu. Create an account with an email and a passphrase of at least 12 characters, then use **My plan**. A valid plan is saved automatically to that account in the local SQLite file `data/user_store.sqlite`; signing in again on the same running app restores it. The password is stored as a salted PBKDF2-HMAC-SHA256 hash, and the browser receives a random, HttpOnly session cookie.
+
+This is a candidate-project demo, not a production identity service: it has no email verification, password reset, account deletion, encrypted database, or hosting backup. Keep the built-in Python server on your own computer (`127.0.0.1`). Do not bind it to a public/network address. A public deployment needs HTTPS, a production web server, protected secret/configuration management, rate limiting, monitoring, secure backups, and a reviewed account recovery flow. When running behind HTTPS locally, set `AUTH_COOKIE_SECURE=1` so session cookies include the Secure attribute.
 
 ## How it works
 

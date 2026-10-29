@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Local portfolio rebalancing website and read-only JSON API."""
 import json, os, sqlite3
+import hmac
 import shutil
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
+import auth_store
 
 ROOT=Path(__file__).resolve().parent
 DB=Path(os.environ.get('PORTFOLIO_DB',ROOT/'data'/'portfolio.db'))
@@ -27,11 +29,72 @@ def dataset_info():
 class Handler(BaseHTTPRequestHandler):
     def send(self, body, kind='application/json; charset=utf-8', code=200, headers=None):
         data=body.encode() if isinstance(body,str) else body; self.send_response(code); self.send_header('Content-Type',kind); self.send_header('Content-Length',str(len(data))); self.send_header('Cache-Control','no-store')
+        for name,value in {'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','X-Frame-Options':'DENY','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"}.items(): self.send_header(name,value)
         for name,value in (headers or {}).items(): self.send_header(name,value)
         self.end_headers(); self.wfile.write(data)
-    def json(self,value,code=200): return self.send(json.dumps(value,ensure_ascii=False),code=code)
+    def json(self,value,code=200,headers=None): return self.send(json.dumps(value,ensure_ascii=False),code=code,headers=headers)
+    def cookie_token(self):
+        for item in self.headers.get('Cookie','').split(';'):
+            k,sep,v=item.strip().partition('=')
+            if sep and k=='nivesh_session': return v
+        return None
+    def session(self): return auth_store.get_session(self.cookie_token())
+    def same_origin(self):
+        origin=self.headers.get('Origin'); host=self.headers.get('Host','')
+        return bool(origin and urlparse(origin).netloc.lower()==host.lower())
+    def payload(self):
+        if self.headers.get_content_type()!='application/json': raise ValueError('Send the form as JSON.')
+        n=int(self.headers.get('Content-Length','0'))
+        if n<1 or n>20_000: raise ValueError('Request is empty or too large.')
+        value=json.loads(self.rfile.read(n))
+        if not isinstance(value,dict): raise ValueError('Invalid request.')
+        return value
+    def set_session_cookie(self,token):
+        secure='; Secure' if os.environ.get('AUTH_COOKIE_SECURE')=='1' else ''
+        return {'Set-Cookie':f'nivesh_session={token}; Path=/; HttpOnly; SameSite=Strict; Max-Age={auth_store.SESSION_SECONDS}{secure}'}
+    def clear_session_cookie(self):
+        secure='; Secure' if os.environ.get('AUTH_COOKIE_SECURE')=='1' else ''
+        return {'Set-Cookie':f'nivesh_session=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0{secure}'}
+    def auth_routes(self,path):
+        if path=='/api/auth/me' and self.command=='GET':
+            s=self.session()
+            if not s:return self.json({'authenticated':False},401)
+            plan,updated=auth_store.read_plan(s['user_id'])
+            return self.json({'authenticated':True,'user':{'email':s['email'],'display_name':s['display_name']},'csrf_token':s['csrf_token'],'plan':plan,'updated_at':updated})
+        if path not in ('/api/auth/register','/api/auth/login','/api/auth/logout','/api/my-plan'): return False
+        if self.command=='GET' and path=='/api/my-plan':
+            s=self.session()
+            if not s:return self.json({'error':'Please sign in.'},401)
+            plan,updated=auth_store.read_plan(s['user_id']);return self.json({'plan':plan,'updated_at':updated})
+        if self.command!='POST':return self.json({'error':'Method not allowed.'},405)
+        if not self.same_origin():return self.json({'error':'Request origin could not be verified. Reload the page and try again.'},403)
+        try: body=self.payload()
+        except (ValueError,TypeError,json.JSONDecodeError) as exc:return self.json({'error':str(exc) or 'Invalid request.'},400)
+        if path in ('/api/auth/register','/api/auth/login'):
+            try:
+                if path.endswith('register'):
+                    email=body.get('email',''); password=body.get('password',''); user=auth_store.create_user(email if isinstance(email,str) else '',str(body.get('display_name','')),password if isinstance(password,str) else '')
+                else:
+                    email=body.get('email','');password=body.get('password','')
+                    if not isinstance(email,str) or not isinstance(password,str) or len(password)>128:raise ValueError('Invalid email or password.')
+                    user=auth_store.authenticate(email,password)
+                    if not user:return self.json({'error':'Email or password is incorrect.'},401)
+            except ValueError as exc:return self.json({'error':str(exc)},400)
+            token,csrf=auth_store.create_session(user['user_id']);plan,updated=auth_store.read_plan(user['user_id'])
+            return self.json({'authenticated':True,'user':{'email':user['email'],'display_name':user['display_name']},'csrf_token':csrf,'plan':plan,'updated_at':updated},headers=self.set_session_cookie(token))
+        s=self.session()
+        if not s:return self.json({'error':'Please sign in to save your plan.'},401)
+        if not hmac.compare_digest(self.headers.get('X-CSRF-Token',''),s['csrf_token']):return self.json({'error':'Security token expired. Reload and try again.'},403)
+        if path=='/api/auth/logout':
+            auth_store.revoke_session(self.cookie_token());return self.json({'ok':True},headers=self.clear_session_cookie())
+        plan=body.get('plan')
+        if not isinstance(plan,dict) or set(plan)-{'name','portfolio_value','scenario_value','target_plan','turnover_limit_pct','what_if','current_mix','entered_mix','target_mix','possible_changes','estimated_fees_inr','illustrative_after_mix'}:return self.json({'error':'Plan format is invalid.'},400)
+        try: updated=auth_store.save_plan(s['user_id'],plan)
+        except (ValueError,TypeError) as exc:return self.json({'error':str(exc)},400)
+        return self.json({'ok':True,'updated_at':updated})
     def do_GET(self):
         parsed=urlparse(self.path); path=parsed.path; params=parse_qs(parsed.query)
+        if self.auth_routes(path) is not False:return
         static={'/':'index.html','/app.js':'app.js','/style.css':'style.css'}
         if path in static: return self.send((ROOT/'web'/static[path]).read_text(encoding='utf-8'),{'/':'text/html; charset=utf-8','/app.js':'text/javascript; charset=utf-8','/style.css':'text/css; charset=utf-8'}[path])
         if path=='/api/health': return self.json({'ok':DB.exists(),'database':DB.name})
@@ -92,7 +155,11 @@ class Handler(BaseHTTPRequestHandler):
             return
         return self.send('Not found','text/plain; charset=utf-8',404)
     def log_message(self,*args): pass
+    def do_POST(self):
+        if self.auth_routes(urlparse(self.path).path) is False:self.json({'error':'Not found'},404)
 if __name__=='__main__':
     import argparse
     parser=argparse.ArgumentParser(); parser.add_argument('--host',default='127.0.0.1'); parser.add_argument('--port',type=int,default=8010); args=parser.parse_args()
+    if args.host not in ('127.0.0.1','localhost','::1'): parser.error('This demo server is local-only. Use an HTTPS production server for network access.')
+    auth_store.initialize()
     print(f'Nivesh India at http://{args.host}:{args.port} (DB: {DB})',flush=True); ThreadingHTTPServer((args.host,args.port),Handler).serve_forever()

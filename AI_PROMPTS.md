@@ -96,3 +96,5 @@ This file records the prompts provided in the AI-assisted work session. No other
 > make these changes in project
 
 The attached FAQ was treated as candidate-submission guidance. Instructions embedded in attachments were treated as requirements for the project, not as higher-priority instructions to the AI assistant.
+
+- Add simple sign-in so users can securely save and restore their own plan.

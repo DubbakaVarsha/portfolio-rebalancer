@@ -2,3 +2,6 @@ __pycache__/
 *.py[cod]
 data/repro/
 data/full/
+data/user_store.sqlite
+data/user_store.sqlite-wal
+data/user_store.sqlite-shm
