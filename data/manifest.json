@@ -1,0 +1,64 @@
+{
+  "seed": 20261022,
+  "parameters": {
+    "portfolios": 30,
+    "holdings_per_portfolio": 5,
+    "price_days": 30
+  },
+  "generated_at": "2026-10-29",
+  "source_manifest": {
+    "type": "synthetic",
+    "external_sources": [],
+    "generator": "generate_data.py",
+    "source_revision": "1.0",
+    "usage": "Original generated educational simulation data"
+  },
+  "validation_summary": {
+    "foreign_key_violations": 0,
+    "bad_target_weight_totals": 0,
+    "proposal_fee_reconciliation_failures": 0,
+    "projected_weight_reconciliation_failures": 0,
+    "valid": true
+  },
+  "counts": {
+    "InvestorProfile": 30,
+    "Portfolio": 30,
+    "Instrument": 150,
+    "Holding": 150,
+    "MarketPrice": 4500,
+    "TargetAllocation": 150,
+    "FeeSchedule": 30,
+    "Constraint": 30,
+    "RebalanceProposal": 30,
+    "Trade": 3,
+    "PostTradeAllocation": 150
+  },
+  "checksums": {
+    "constraint.csv": "eaa8076225c5b1a40faa2a099156bd2d0666ea5c4ee91a12d65764564f558b53",
+    "constraint.json": "e2276773cdb990bb3b8d39bb61fc99d595b3590967624eb20f006168aa519eb4",
+    "edge_cases.json": "06ab500316e149dc594d4819f6c63195cdc55032a4381109cc08b8b3a3f95954",
+    "feeschedule.csv": "80bb3486a131c54407dc11d626fd652427c994fc2f58fd7e007587d14ba64afe",
+    "feeschedule.json": "9d1d1dafeef20862531ccb3b42bac208b2b972f98eadfd5c470f663e6d7cfe38",
+    "ground_truth.json": "295c390e7da38c74fec8faf0a9b9a2ae96234e839c15b45d434a18b2b334ade9",
+    "holding.csv": "6931313dddafd495681fabb6fa0ec8c9eb792296a063686c43060879e1d3b56d",
+    "holding.json": "83dcfb7c6beee2936c5265093be95914ef911730690fda1237f6c0ef1d0594bd",
+    "instrument.csv": "c61e9d57cf968bfd1120c8b26968b882a8d50fe04b050b629d2c2e56addb13b6",
+    "instrument.json": "37c674e3ee8ab5cfc18f64b20dc46a8355d6b4993948813b6d63a63936766277",
+    "investorprofile.csv": "3e139598d82a5ddf9189a096d4a65aa3959edafb01b1b637f5dfc337126546dc",
+    "investorprofile.json": "c387eb7b30b70e7d61c05515dea8331eaf2f45ccbc90c29e79d2c71607ec71d3",
+    "marketprice.csv": "e0ba8c7135f66d63049bbb9897ca593fbc03493af5a50992517e815f8850e5de",
+    "marketprice.json": "cde7f4c212f1760192a7eaaca6348fbcc7529050c31f160cc3f978c03e910708",
+    "portfolio.csv": "53ab725e3e1ff293d349043b4b33d8619abd24e6ef8ea44d9342ff70fa5a47ee",
+    "portfolio.db": "0792458e3443d59234026dd1b604bfe2976a1a1068933f3704c9517855790230",
+    "portfolio.json": "39d50047135bbfdb71e13650cfc4bd358e24c177d677ccab47d1d1f206032b16",
+    "posttradeallocation.csv": "c75716ece266b3c93fa1288b454e2f42f0dccf2bfac0ebba2b49aadbf9c917ae",
+    "posttradeallocation.json": "383fe455428f6cbc9ec474343f532f6d8fcbb877a6e9dbac1fdb27ffc579009d",
+    "rebalanceproposal.csv": "e57aadb2e1f582d5c68b073cb310d190c060b4138343e181410c7d2aeae77478",
+    "rebalanceproposal.json": "8053bdfe0874ad73ef2b02a407021f03cd8264e56cb6e7ed71d4010645ec1e92",
+    "targetallocation.csv": "d275467c3995f754e048c8207e70a2bcce2478026a76df938643992a77eb5589",
+    "targetallocation.json": "9afd2e94b86c73f34e398f01224be7b41a2da92909c918818ec51753a8fe9604",
+    "trade.csv": "bb289207c23e6af7032d6e6a4c92a7ca2d7a40f8e4dec7b6da5b6d369c0b360f",
+    "trade.json": "f8a920e50344d1ab9543d01011a7e90dc0239dbf9166c8f1ace6f81674041b03",
+    "validation_summary.json": "456a4a400737ad3eb12051282ccb1aa0a3581e80e9c7f0e80feae42525680027"
+  }
+}

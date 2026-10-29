@@ -1,0 +1,50 @@
+[
+  {
+    "portfolio_id": "PORT-INV-000004-01",
+    "issue_type": "fee_tier",
+    "expected_action": "REVIEW",
+    "source_rule": "generator documented deterministic rule"
+  },
+  {
+    "portfolio_id": "PORT-INV-000008-01",
+    "issue_type": "fee_tier",
+    "expected_action": "REVIEW",
+    "source_rule": "generator documented deterministic rule"
+  },
+  {
+    "portfolio_id": "PORT-INV-000012-01",
+    "issue_type": "fee_tier",
+    "expected_action": "REVIEW",
+    "source_rule": "generator documented deterministic rule"
+  },
+  {
+    "portfolio_id": "PORT-INV-000016-01",
+    "issue_type": "fee_tier",
+    "expected_action": "REVIEW",
+    "source_rule": "generator documented deterministic rule"
+  },
+  {
+    "portfolio_id": "PORT-INV-000019-01",
+    "issue_type": "high_drift",
+    "expected_action": "REVIEW",
+    "source_rule": "generator documented deterministic rule"
+  },
+  {
+    "portfolio_id": "PORT-INV-000020-01",
+    "issue_type": "fee_tier",
+    "expected_action": "REVIEW",
+    "source_rule": "generator documented deterministic rule"
+  },
+  {
+    "portfolio_id": "PORT-INV-000024-01",
+    "issue_type": "fee_tier",
+    "expected_action": "REVIEW",
+    "source_rule": "generator documented deterministic rule"
+  },
+  {
+    "portfolio_id": "PORT-INV-000028-01",
+    "issue_type": "fee_tier",
+    "expected_action": "REVIEW",
+    "source_rule": "generator documented deterministic rule"
+  }
+]

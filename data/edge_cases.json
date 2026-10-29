@@ -1,0 +1,61 @@
+[
+  {
+    "scenario_id": "EDGE-001",
+    "issue_type": "allocation_not_100_percent",
+    "input": {
+      "target_weights_pct": [
+        30,
+        20,
+        20,
+        10,
+        10
+      ]
+    },
+    "expected_decision": "BLOCK_AND_FLAG",
+    "rule": "Active target allocation must sum to exactly 100%."
+  },
+  {
+    "scenario_id": "EDGE-002",
+    "issue_type": "trade_exceeds_holding",
+    "input": {
+      "side": "SELL",
+      "held_quantity": 2.0,
+      "proposed_quantity": 2.5
+    },
+    "expected_decision": "BLOCK",
+    "rule": "A sell quantity cannot exceed the available holding."
+  },
+  {
+    "scenario_id": "EDGE-003",
+    "issue_type": "excluded_instrument_recommended",
+    "input": {
+      "instrument_eligible": false,
+      "trade_status": "PROPOSED"
+    },
+    "expected_decision": "BLOCK",
+    "rule": "Ineligible instruments cannot be proposed for execution."
+  },
+  {
+    "scenario_id": "EDGE-004",
+    "issue_type": "fee_omitted",
+    "input": {
+      "notional": 100000.0,
+      "fee_rate": 0.0015,
+      "minimum_fee": 10.0,
+      "estimated_fee": 0.0,
+      "currency": "INR"
+    },
+    "expected_decision": "FLAG",
+    "rule": "Estimate fee as max(minimum fee, notional times applicable rate)."
+  },
+  {
+    "scenario_id": "EDGE-005",
+    "issue_type": "stale_price_unflagged",
+    "input": {
+      "price_age_days": 5,
+      "stale_flag": false
+    },
+    "expected_decision": "FLAG_AND_BLOCK",
+    "rule": "Price older than one trading day must be marked stale and excluded from a new proposal."
+  }
+]

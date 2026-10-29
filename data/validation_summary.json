@@ -1,0 +1,7 @@
+{
+  "foreign_key_violations": 0,
+  "bad_target_weight_totals": 0,
+  "proposal_fee_reconciliation_failures": 0,
+  "projected_weight_reconciliation_failures": 0,
+  "valid": true
+}
