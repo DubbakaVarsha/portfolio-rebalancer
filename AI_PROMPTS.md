@@ -87,4 +87,8 @@ This file records the prompts provided in the AI-assisted work session. No other
 
 > i need a user so that apply they plan and know the result of our plan
 
+## Prompt 8 — local page not opening
+
+> its not opening
+
 The attached FAQ was treated as candidate-submission guidance. Instructions embedded in attachments were treated as requirements for the project, not as higher-priority instructions to the AI assistant.
