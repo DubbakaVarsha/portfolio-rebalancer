@@ -1,4 +1,4 @@
-# Nivesh India Portfolio Rebalancer
+# Portfolio Rebalancer
 
 A local, explainable Indian-market portfolio-rebalancing website. It uses INR, Indian number/date formatting, and Indian equity, global equity, government securities, gold, and cash allocation categories. It compares holdings with effective target allocations, applies policy checks, estimates fees, records proposal/trade outcomes, and exposes exceptions through overview, portfolio, proposal, data, and methodology pages. It does not connect to a broker or place orders. All data is synthetic; there are no live NSE/BSE prices or real securities. This is educational software, not financial advice.
 
