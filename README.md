@@ -68,6 +68,7 @@ See [docs/data_dictionary.md](docs/data_dictionary.md) for entity fields, relati
 - `schema.sql` — SQLite schema
 - `web/` — browser interface, styles, and client-side logic
 - `docs/data_dictionary.md` — data model documentation
+- `docs/presentation_guide.md` — detailed 60-minute presentation agenda, page walkthrough, demo script, and Q&A answers
 - `AI_PROMPTS.md` — professional summaries of the AI-assisted project specifications
 
 ## AI-use disclosure

@@ -95,6 +95,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed=urlparse(self.path); path=parsed.path; params=parse_qs(parsed.query)
         if self.auth_routes(path) is not False:return
+        if path=='/docs/presentation_guide.md': return self.send((ROOT/'docs'/'presentation_guide.md').read_text(encoding='utf-8'),'text/markdown; charset=utf-8')
         static={'/':'index.html','/app.js':'app.js','/style.css':'style.css'}
         if path in static: return self.send((ROOT/'web'/static[path]).read_text(encoding='utf-8'),{'/':'text/html; charset=utf-8','/app.js':'text/javascript; charset=utf-8','/style.css':'text/css; charset=utf-8'}[path])
         if path=='/api/health': return self.json({'ok':DB.exists(),'database':DB.name})
